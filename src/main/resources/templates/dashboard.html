@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAY - KARO OFFLINE — Interactive Simulator & Security Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #060911;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --bg-input: #0b1120;
+            --border: rgba(148, 163, 184, 0.15);
+            --border-glow: rgba(56, 189, 248, 0.35);
+            
+            --cyan: #38bdf8;
+            --cyan-glow: rgba(56, 189, 248, 0.25);
+            --emerald: #10b981;
+            --emerald-glow: rgba(16, 185, 129, 0.25);
+            --purple: #a855f7;
+            --purple-glow: rgba(168, 85, 247, 0.25);
+            --rose: #f43f5e;
+            --rose-glow: rgba(244, 63, 94, 0.25);
+            --amber: #f59e0b;
+            --amber-glow: rgba(245, 158, 11, 0.25);
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+        }
+
+        /* Light Mode Palette */
+        body.light-theme {
+            --bg-primary: #f8fafc;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-card-hover: rgba(241, 245, 249, 0.95);
+            --bg-input: #ffffff;
+            --border: rgba(148, 163, 184, 0.28);
+            --border-glow: rgba(2, 132, 199, 0.3);
+
+            --cyan: #0284c7;
+            --cyan-glow: rgba(2, 132, 199, 0.2);
+            --emerald: #059669;
+            --emerald-glow: rgba(5, 150, 105, 0.2);
+            --purple: #9333ea;
+            --purple-glow: rgba(147, 51, 234, 0.2);
+            --rose: #e11d48;
+            --rose-glow: rgba(225, 29, 72, 0.2);
+            --amber: #d97706;
+            --amber-glow: rgba(217, 119, 6, 0.2);
+
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-dim: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at 15% 15%, #0f172a 0%, #060911 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        body.light-theme {
+            background: radial-gradient(circle at 15% 15%, #e2e8f0 0%, #f1f5f9 100%);
+        }
+
+        body.light-theme header {
+            background: rgba(255, 255, 255, 0.88);
+            border-bottom-color: rgba(148, 163, 184, 0.25);
+        }
+        body.light-theme .brand-title {
+            background: linear-gradient(90deg, #0f172a, #0284c7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        body.light-theme .glass {
+            background: var(--bg-card);
+            border-color: rgba(148, 163, 184, 0.25);
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        body.light-theme .btn-ghost {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--text-main);
+            border-color: rgba(148, 163, 184, 0.3);
+        }
+        body.light-theme .btn-ghost:hover {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: rgba(100, 116, 139, 0.4);
+        }
+        body.light-theme .story-step {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(148, 163, 184, 0.25);
+            color: var(--text-dim);
+        }
+        body.light-theme .story-step.active {
+            background: rgba(2, 132, 199, 0.12);
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        body.light-theme .story-step.completed {
+            background: rgba(5, 150, 105, 0.12);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+        body.light-theme .step-circle {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--text-muted);
+        }
+        body.light-theme .phone-bezel {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+        body.light-theme .phone-camera-notch {
+            background: #e2e8f0;
+        }
+        body.light-theme .phone-card {
+            background: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+        body.light-theme .custom-select,
+        body.light-theme .custom-input {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+        body.light-theme .chip {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        body.light-theme .chip:hover {
+            background: rgba(2, 132, 199, 0.15);
+            color: #0284c7;
+            border-color: #0284c7;
+        }
+        body.light-theme .num-btn {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #0f172a;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        body.light-theme .num-btn:hover {
+            background: #f1f5f9;
+        }
+        body.light-theme .pin-dot {
+            background: rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
+        }
+        body.light-theme .pin-dot.filled {
+            background: var(--cyan);
+            border-color: var(--cyan);
+        }
+        body.light-theme #meshCanvas {
+            background: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.25);
+        }
+        body.light-theme .data-table td {
+            border-bottom-color: rgba(0, 0, 0, 0.05);
+            color: #1e293b;
+        }
+        body.light-theme .data-table th {
+            color: #64748b;
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-theme .attack-card {
+            background: linear-gradient(135deg, rgba(225, 29, 72, 0.04), rgba(255, 255, 255, 0.95));
+            border-color: rgba(225, 29, 72, 0.25);
+        }
+        body.light-theme .attack-btn-box {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        body.light-theme .attack-title {
+            color: #e11d48;
+        }
+        body.light-theme .modal-card {
+            background: #ffffff;
+            border-color: rgba(148, 163, 184, 0.3);
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.2);
+            color: #0f172a;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        /* Top Header */
+        header {
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            background: rgba(6, 9, 17, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: transparent;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #f8fafc, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand-tag {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--cyan);
+            background: rgba(56, 189, 248, 0.12);
+            padding: 2px 8px;
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            text-decoration: none;
+            user-select: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+        }
+        .btn-emerald {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);
+        }
+        .btn-emerald:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateY(-1px);
+        }
+        .btn-rose {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+        .btn-rose:hover {
+            background: rgba(244, 63, 94, 0.25);
+            color: #fff;
+        }
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        .btn-icon {
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .btn-icon:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .app-body {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Progress & Quick Flow Bar */
+        .story-bar {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .story-steps {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .story-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            transition: all 0.3s;
+        }
+        .story-step.active {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 16px var(--cyan-glow);
+        }
+        .story-step.completed {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+        .step-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .story-step.active .step-circle {
+            background: var(--cyan);
+            color: #000;
+        }
+        .story-step.completed .step-circle {
+            background: var(--emerald);
+            color: #000;
+        }
+        .story-arrow {
+            color: var(--text-dim);
+            font-size: 12px;
+        }
+
+        /* 3-Column Studio Grid */
+        .studio-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr 380px;
+            gap: 20px;
+            align-items: stretch;
+        }
+        @media (max-width: 1400px) {
+            .studio-grid { grid-template-columns: 340px 1fr; }
+            .col-right { grid-column: span 2; }
+        }
+        @media (max-width: 1000px) {
+            .studio-grid { grid-template-columns: 1fr; }
+            .col-right { grid-column: span 1; }
+        }
+
+        /* LEFT COLUMN: Smartphone Mockup */
+        .phone-mockup-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .phone-bezel {
+            width: 100%;
+            background: #000;
+            border: 3px solid #1e293b;
+            border-radius: 36px;
+            padding: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .phone-camera-notch {
+            width: 90px;
+            height: 18px;
+            background: #111827;
+            border-radius: 0 0 12px 12px;
+            margin: -16px auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .notch-lens {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #030712;
+            border: 1px solid #1f2937;
+        }
+        .phone-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            padding: 0 6px;
+        }
+        .status-offline-badge {
+            color: var(--rose);
+            background: rgba(244, 63, 94, 0.12);
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+        }
+
+        .phone-card {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .upi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .upi-logo-text {
+            font-size: 13px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 0.5px;
+        }
+        .upi-sender-badge {
+            font-size: 11px;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sender-avatar {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .custom-select, .custom-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 9px 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .custom-select:focus, .custom-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        .amount-row {
+            position: relative;
+        }
+        .amount-currency {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+        .amount-input {
+            padding-left: 32px !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            font-family: 'JetBrains Mono', monospace !important;
+        }
+        .quick-chips {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .chip {
+            padding: 3px 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.15s;
+        }
+        .chip:hover {
+            background: rgba(56, 189, 248, 0.2);
+            color: var(--cyan);
+            border-color: var(--cyan);
+        }
+
+        /* Virtual PIN Pad */
+        .pin-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .pin-display {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 6px 0;
+        }
+        .pin-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pin-dot.filled {
+            background: var(--cyan);
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan-glow);
+            transform: scale(1.15);
+        }
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .num-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 0;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+        .num-btn:active {
+            background: rgba(56, 189, 248, 0.25);
+            transform: scale(0.95);
+        }
+        .num-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* CENTER COLUMN: Canvas Topology */
+        .col-center {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .canvas-card {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            flex: 1;
+            min-height: 480px;
+        }
+        .canvas-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .canvas-legend {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        #meshCanvas {
+            width: 100%;
+            height: 420px;
+            border-radius: var(--radius-md);
+            background: #040711;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            cursor: grab;
+            display: block;
+        }
+        #meshCanvas:active {
+            cursor: grabbing;
+        }
+
+        /* Controls row below canvas */
+        .mesh-action-dock {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .dock-left, .dock-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* RIGHT COLUMN: Ledger & Accounts */
+        .col-right {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .accounts-card, .ledger-card {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .card-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .data-table th {
+            text-align: left;
+            padding: 8px 10px;
+            color: var(--text-dim);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+        }
+        .balance-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--emerald);
+        }
+
+        .badge-status {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .badge-SETTLED {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .badge-DUPLICATE_DROPPED {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .badge-INVALID {
+            background: rgba(244, 63, 94, 0.15);
+            color: #fb7185;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        /* BOTTOM SECTION: Attack Playground & Real-Time Telemetry */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 1100px) {
+            .bottom-grid { grid-template-columns: 1fr; }
+        }
+
+        .attack-card {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            border-color: rgba(244, 63, 94, 0.2);
+            background: linear-gradient(135deg, rgba(244, 63, 94, 0.04), rgba(15, 23, 42, 0.8));
+        }
+        .attack-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 768px) {
+            .attack-actions { grid-template-columns: 1fr; }
+        }
+        .attack-btn-box {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .attack-btn-box:hover {
+            border-color: var(--rose);
+            box-shadow: 0 0 16px var(--rose-glow);
+            transform: translateY(-2px);
+        }
+        .attack-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fca5a5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .attack-desc {
+            font-size: 11px;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        /* Live Terminal */
+        .terminal-card {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .terminal-screen {
+            background: #02040a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 4px;
+        }
+        .term-line {
+            line-height: 1.4;
+            word-break: break-all;
+        }
+        .term-time { color: var(--text-dim); margin-right: 6px; }
+        .term-info { color: #38bdf8; }
+        .term-success { color: #34d399; }
+        .term-warn { color: #fbbf24; }
+        .term-danger { color: #f87171; }
+
+        /* Crypto Inspector Drawer / Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            place-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .modal-card {
+            max-width: 650px;
+            width: 100%;
+            background: #0b1329;
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px var(--cyan-glow);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .code-block {
+            background: #030712;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #38bdf8;
+            max-height: 180px;
+            overflow-y: auto;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        /* Toast Notifications */
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        .toast {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success { border-color: var(--emerald); box-shadow: 0 0 20px var(--emerald-glow); }
+        .toast-danger { border-color: var(--rose); box-shadow: 0 0 20px var(--rose-glow); }
+        .toast-warn { border-color: var(--amber); box-shadow: 0 0 20px var(--amber-glow); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <div class="logo-badge">
+                <img src="/images/app-icon.png" alt="Pay Karo Offline Icon" style="width: 44px; height: 44px; border-radius: 10px; display: block; object-fit: cover;">
+            </div>
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="brand-title">PAY - KARO OFFLINE</span>
+                    <span class="brand-tag">Simulator & Lab</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-dim);">
+                    Zero-Internet Peer-to-Peer Payments via Bluetooth Low Energy Gossip
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn btn-ghost" id="themeToggleBtn" title="Toggle Light / Dark Mode">
+                🌙 Dark Mode
+            </button>
+            <button class="btn btn-primary" id="autoDemoBtn">
+                ▶️ Auto-Run Story
+            </button>
+        </div>
+    </header>
+
+    <div class="app-body">
+
+        <!-- Top Progress Storyline -->
+        <div class="glass story-bar">
+            <div class="story-steps">
+                <div class="story-step active" id="step1Indicator">
+                    <span class="step-circle">1</span>
+                    <span>Compose & Encrypt</span>
+                </div>
+                <span class="story-arrow">➜</span>
+                <div class="story-step" id="step2Indicator">
+                    <span class="step-circle">2</span>
+                    <span>BLE Mesh Gossip</span>
+                </div>
+                <span class="story-arrow">➜</span>
+                <div class="story-step" id="step3Indicator">
+                    <span class="step-circle">3</span>
+                    <span>4G Bridge Upload</span>
+                </div>
+                <span class="story-arrow">➜</span>
+                <div class="story-step" id="step4Indicator">
+                    <span class="step-circle">4</span>
+                    <span>Atomic Settlement</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 12px; color: var(--text-dim);" id="cacheBadge">
+                    Idempotency Cache: 0 entries
+                </span>
+                <button class="btn btn-ghost" id="clearMeshBtn" style="padding: 6px 12px; font-size: 12px;">
+                    🗑️ Reset Mesh
+                </button>
+            </div>
+        </div>
+
+        <!-- 3-Column Interactive Studio -->
+        <div class="studio-grid">
+
+            <!-- LEFT: Interactive Smartphone Mockup -->
+            <div class="phone-mockup-wrapper">
+                <div class="phone-bezel">
+                    <div class="phone-camera-notch">
+                        <div class="notch-lens"></div>
+                    </div>
+
+                    <div class="phone-status-bar">
+                        <span id="phoneClock">12:30</span>
+                        <span class="status-offline-badge">
+                            <span>🚫</span> NO SERVICE (OFFLINE)
+                        </span>
+
+                    </div>
+
+                    <div class="phone-card">
+                        <div class="upi-header">
+                            <span class="upi-logo-text">⚡ PAY - KARO OFFLINE</span>
+                            <div class="upi-sender-badge">
+                                <div class="sender-avatar" id="senderAvatar">A</div>
+                                <span id="senderNameDisplay">Alice</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="senderSelect">From (Offline Phone)</label>
+                            <select id="senderSelect" class="custom-select">
+                                <option value="alice@demo" data-device="phone-alice" data-avatar="A">Alice (₹5,000.00)</option>
+                                <option value="bob@demo" data-device="phone-bob" data-avatar="B">Bob (₹1,000.00)</option>
+                                <option value="carol@demo" data-device="phone-carol" data-avatar="C">Carol (₹2,500.00)</option>
+                                <option value="dave@demo" data-device="phone-dave" data-avatar="D">Dave (₹500.00)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="receiverSelect">Pay To</label>
+                            <select id="receiverSelect" class="custom-select">
+                                <option value="bob@demo">Bob (bob@demo)</option>
+                                <option value="carol@demo">Carol (carol@demo)</option>
+                                <option value="dave@demo">Dave (dave@demo)</option>
+                                <option value="alice@demo">Alice (alice@demo)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="amountInput">Amount</label>
+                            <div class="amount-row">
+                                <span class="amount-currency">₹</span>
+                                <input type="number" id="amountInput" class="custom-input amount-input" value="100" min="1" max="10000">
+                            </div>
+                            <div class="quick-chips">
+                                <span class="chip" data-amt="100">₹100</span>
+                                <span class="chip" data-amt="250">₹250</span>
+                                <span class="chip" data-amt="500">₹500</span>
+                                <span class="chip" data-amt="1000">₹1,000</span>
+                            </div>
+                        </div>
+
+                        <!-- Virtual PIN Area -->
+                        <div class="pin-wrapper">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label class="form-label" style="margin:0;">Enter 4-Digit UPI PIN</label>
+                                <span style="font-size: 10px; color: var(--text-dim);">(Default: 1234)</span>
+                            </div>
+                            <div class="pin-display">
+                                <div class="pin-dot" id="dot0"></div>
+                                <div class="pin-dot" id="dot1"></div>
+                                <div class="pin-dot" id="dot2"></div>
+                                <div class="pin-dot" id="dot3"></div>
+                            </div>
+
+                            <div class="numpad">
+                                <button class="num-btn" data-num="1">1</button>
+                                <button class="num-btn" data-num="2">2</button>
+                                <button class="num-btn" data-num="3">3</button>
+                                <button class="num-btn" data-num="4">4</button>
+                                <button class="num-btn" data-num="5">5</button>
+                                <button class="num-btn" data-num="6">6</button>
+                                <button class="num-btn" data-num="7">7</button>
+                                <button class="num-btn" data-num="8">8</button>
+                                <button class="num-btn" data-num="9">9</button>
+                                <button class="num-btn" id="pinClearBtn" style="color:var(--rose);">C</button>
+                                <button class="num-btn" data-num="0">0</button>
+                                <button class="num-btn" id="pinBackBtn">⌫</button>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" id="injectBtn" style="width: 100%; padding: 12px; margin-top: 4px;">
+                            🔒 Encrypt & Broadcast via BLE
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CENTER: Interactive Topology Canvas & Controls -->
+            <div class="col-center">
+                <div class="glass canvas-card">
+                    <div class="canvas-toolbar">
+                        <div class="card-title">
+                            <span>🗺️ Live Bluetooth Mesh Topology</span>
+                            <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">
+                                (Drag nodes to reposition)
+                            </span>
+                        </div>
+
+                        <div class="canvas-legend">
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background:#64748b;"></div>
+                                <span>Offline Phone</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background:#10b981; box-shadow: 0 0 8px rgba(16,185,129,0.8);"></div>
+                                <span>4G Bridge Node</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-dot" style="background:#38bdf8;"></div>
+                                <span>BLE Radio Ring</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas -->
+                    <canvas id="meshCanvas" width="800" height="420"></canvas>
+
+                    <!-- Dock Actions -->
+                    <div class="glass mesh-action-dock">
+                        <div class="dock-left">
+                            <button class="btn btn-emerald" id="gossipBtn">
+                                🔄 Gossip 1 Hop
+                            </button>
+                            <button class="btn btn-primary" id="flushBtn">
+                                📡 Bridges Upload (4G)
+                            </button>
+                        </div>
+
+                        <div class="dock-right">
+                            <button class="btn btn-ghost" id="addDeviceBtn" title="Add another stranger phone to the mesh">
+                                ➕ Add Phone
+                            </button>
+                            <button class="btn btn-ghost" id="tamperSelectedBtn" title="Tamper with packet on selected device">
+                                ⚡ Tamper Packet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Real-time Accounts & Transactions -->
+            <div class="col-right">
+
+                <!-- Account Balances -->
+                <div class="glass accounts-card">
+                    <div class="card-header-row">
+                        <div class="card-title">
+                            <span>💳 Core Banking Ledger</span>
+                        </div>
+                        <button class="btn btn-ghost" id="resetAccountsBtn" style="padding: 4px 8px; font-size: 11px;">
+                            Reset Balances
+                        </button>
+                    </div>
+
+                    <table class="data-table" id="accountsTable">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Holder</th>
+                                <th style="text-align: right;">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamically populated -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="glass ledger-card" style="flex:1;">
+                    <div class="card-header-row">
+                        <div class="card-title">
+                            <span>📜 Settlement Ledger</span>
+                        </div>
+                        <span style="font-size: 11px; color: var(--text-dim);" id="txCountBadge">0 records</span>
+                    </div>
+
+                    <div style="overflow-y: auto; max-height: 260px;">
+                        <table class="data-table" id="ledgerTable">
+                            <thead>
+                                <tr>
+                                    <th>Tx</th>
+                                    <th>Flow</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Hops</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamically populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BOTTOM: Security Playground & Activity Log -->
+        <div class="bottom-grid">
+
+            <!-- Attack Lab -->
+            <div class="glass attack-card">
+                <div class="card-title" style="color: #fb7185;">
+                    <span>🛡️ Security & Resilience Playground</span>
+                    <span style="font-size: 11px; font-weight: 500; color: var(--text-dim);">
+                        (Test how the cryptographic architecture resists real-world attacks)
+                    </span>
+                </div>
+
+                <div class="attack-actions">
+                    <div class="attack-btn-box" id="attackTamperCard">
+                        <div class="attack-title">
+                            <span>⚡ Man-in-the-Middle</span>
+                        </div>
+                        <div class="attack-desc">
+                            Flips a byte in the packet held by a stranger device. Tests whether AES-GCM tag verification catches tampering.
+                        </div>
+                        <button class="btn btn-rose" style="width: 100%; padding: 6px; font-size: 11px; margin-top: auto;">
+                            Tamper & Inject
+                        </button>
+                    </div>
+
+                    <div class="attack-btn-box" id="attackReplayCard">
+                        <div class="attack-title">
+                            <span>🔁 Replay Attack</span>
+                        </div>
+                        <div class="attack-desc">
+                            Re-submits an already settled transaction packet. Demonstrates instant sub-5ms SHA-256 idempotency cache drop.
+                        </div>
+                        <button class="btn btn-rose" style="width: 100%; padding: 6px; font-size: 11px; margin-top: auto;">
+                            Replay Settled Packet
+                        </button>
+                    </div>
+
+                    <div class="attack-btn-box" id="attackRaceCard">
+                        <div class="attack-title">
+                            <span>🌪️ 3-Bridge Storm</span>
+                        </div>
+                        <div class="attack-desc">
+                            Simulates 3 bridge phones simultaneously uploading the exact same packet. Asserts atomic settle-once handling.
+                        </div>
+                        <button class="btn btn-rose" style="width: 100%; padding: 6px; font-size: 11px; margin-top: auto;">
+                            Fire Concurrency Storm
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Activity Log -->
+            <div class="glass terminal-card">
+                <div class="card-header-row">
+                    <div class="card-title">
+                        <span>💻 Live Network & Security Telemetry</span>
+                    </div>
+                    <button class="btn btn-ghost" id="clearLogBtn" style="padding: 4px 8px; font-size: 11px;">
+                        Clear Log
+                    </button>
+                </div>
+
+                <div class="terminal-screen" id="termOutput">
+                    <div class="term-line term-info">[SYSTEM READY] Simulation engine listening on port 8080. Zero internet mesh active.</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // ------------------------------------------------------------- Audio FX (Web Audio API)
+        let audioEnabled = false;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, delay = 0) {
+            if (!audioEnabled || !audioCtx) return;
+            setTimeout(() => {
+                try {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + duration);
+                } catch(e) {}
+            }, delay * 1000);
+        }
+
+        function playSuccessChord() {
+            playTone(523.25, 'sine', 0.25, 0);     // C5
+            playTone(659.25, 'sine', 0.25, 0.08);  // E5
+            playTone(783.99, 'sine', 0.35, 0.16);  // G5
+            playTone(1046.50, 'sine', 0.45, 0.24); // C6
+        }
+
+        function playHopBlip() {
+            playTone(880, 'sine', 0.08, 0);
+        }
+
+        function playUploadSweep() {
+            if (!audioEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch(e) {}
+        }
+
+        function playErrorBuzz() {
+            playTone(140, 'sawtooth', 0.3, 0);
+        }
+
+        // ------------------------------------------------------------- State & Canvas
+        let currentPin = "1234";
+        let enteredPin = "";
+        let meshDevices = [];
+        let particles = [];
+        let activeStoryStep = 1;
+
+        const canvas = document.getElementById('meshCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Node spatial representation
+        let nodePositions = {
+            'phone-alice': { x: 120, y: 140, label: 'Alice (Sender)', isBridge: false },
+            'phone-stranger1': { x: 260, y: 90, label: 'Stranger 1', isBridge: false },
+            'phone-stranger2': { x: 280, y: 280, label: 'Stranger 2', isBridge: false },
+            'phone-stranger3': { x: 440, y: 160, label: 'Stranger 3', isBridge: false },
+            'phone-bridge': { x: 650, y: 220, label: 'Bridge (4G)', isBridge: true }
+        };
+
+        // Dragging support
+        let draggedNode = null;
+        let dragOffset = { x: 0, y: 0 };
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+            for (const [id, pos] of Object.entries(nodePositions)) {
+                const dist = Math.hypot(mouseX - pos.x, mouseY - pos.y);
+                if (dist < 28) {
+                    draggedNode = id;
+                    dragOffset.x = mouseX - pos.x;
+                    dragOffset.y = mouseY - pos.y;
+                    break;
+                }
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!draggedNode) return;
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+            nodePositions[draggedNode].x = Math.max(40, Math.min(canvas.width - 40, mouseX - dragOffset.x));
+            nodePositions[draggedNode].y = Math.max(40, Math.min(canvas.height - 40, mouseY - dragOffset.y));
+        });
+
+        window.addEventListener('mouseup', () => {
+            draggedNode = null;
+        });
+
+        // ------------------------------------------------------------- Canvas Render Loop
+        function renderMesh() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isLight = document.body.classList.contains('light-theme');
+
+            // Draw Zone background lines (Basement vs Surface)
+            const splitX = canvas.width * 0.65;
+            
+            // Basement zone (Left)
+            ctx.fillStyle = isLight ? "rgba(226, 232, 240, 0.7)" : "rgba(15, 23, 42, 0.4)";
+            ctx.fillRect(0, 0, splitX, canvas.height);
+            ctx.strokeStyle = isLight ? "rgba(148, 163, 184, 0.35)" : "rgba(148, 163, 184, 0.1)";
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(splitX, 0);
+            ctx.lineTo(splitX, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Zone labels
+            ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+            ctx.fillStyle = isLight ? "rgba(71, 85, 105, 0.85)" : "rgba(148, 163, 184, 0.4)";
+            ctx.fillText("🚫 BASEMENT / BUNKER (ZERO INTERNET)", 24, 28);
+            ctx.fillStyle = isLight ? "rgba(5, 150, 105, 0.95)" : "rgba(16, 185, 129, 0.6)";
+            ctx.fillText("📶 SURFACE ZONE (4G ACTIVE)", splitX + 20, 28);
+
+            // Draw mesh link connections between nodes in BLE range (< 220px)
+            const nodeKeys = Object.keys(nodePositions);
+            for (let i = 0; i < nodeKeys.length; i++) {
+                for (let j = i + 1; j < nodeKeys.length; j++) {
+                    const p1 = nodePositions[nodeKeys[i]];
+                    const p2 = nodePositions[nodeKeys[j]];
+                    const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                    if (dist < 230) {
+                        const alpha = Math.max(0.05, 1 - (dist / 230));
+                        ctx.strokeStyle = isLight ? `rgba(2, 132, 199, ${alpha * 0.5})` : `rgba(56, 189, 248, ${alpha * 0.35})`;
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([6, 6]);
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                }
+            }
+
+            // Draw animated particles
+            const now = Date.now();
+            particles = particles.filter(p => {
+                const progress = (now - p.startTime) / p.duration;
+                if (progress >= 1) return false;
+
+                const curX = p.fromX + (p.toX - p.fromX) * progress;
+                const curY = p.fromY + (p.toY - p.fromY) * progress;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(curX, curY, p.size || 5, 0, Math.PI * 2);
+                ctx.fillStyle = p.color || (isLight ? "#0284c7" : "#38bdf8");
+                ctx.shadowColor = p.color || (isLight ? "#0284c7" : "#38bdf8");
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.restore();
+                return true;
+            });
+
+            // Draw Nodes
+            for (const [id, pos] of Object.entries(nodePositions)) {
+                const dev = meshDevices.find(d => d.deviceId === id) || { packetCount: 0, hasInternet: pos.isBridge };
+                const hasPackets = dev.packetCount > 0;
+                const isOnline = dev.hasInternet;
+
+                // Radar pulse if holding packet
+                if (hasPackets) {
+                    const pulseRadius = 24 + (Math.sin(now / 200) * 8 + 8);
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, pulseRadius, 0, Math.PI * 2);
+                    ctx.strokeStyle = isOnline 
+                        ? (isLight ? "rgba(5, 150, 105, 0.4)" : "rgba(16, 185, 129, 0.4)")
+                        : (isLight ? "rgba(2, 132, 199, 0.4)" : "rgba(56, 189, 248, 0.4)");
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Outer Node Circle
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 24, 0, Math.PI * 2);
+                ctx.fillStyle = isOnline 
+                    ? (isLight ? "rgba(5, 150, 105, 0.15)" : "rgba(16, 185, 129, 0.2)")
+                    : (hasPackets 
+                        ? (isLight ? "rgba(2, 132, 199, 0.15)" : "rgba(56, 189, 248, 0.2)") 
+                        : (isLight ? "rgba(241, 245, 249, 0.95)" : "rgba(30, 41, 59, 0.6)"));
+                ctx.strokeStyle = isOnline 
+                    ? (isLight ? "#059669" : "#10b981") 
+                    : (hasPackets 
+                        ? (isLight ? "#0284c7" : "#38bdf8") 
+                        : (isLight ? "#94a3b8" : "#475569"));
+                ctx.lineWidth = 2.5;
+                if (hasPackets) {
+                    ctx.shadowColor = isOnline ? (isLight ? "#059669" : "#10b981") : (isLight ? "#0284c7" : "#38bdf8");
+                    ctx.shadowBlur = 14;
+                }
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+
+                // Device Icon
+                ctx.font = "14px 'Plus Jakarta Sans', sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(isOnline ? "📶" : (id === 'phone-alice' ? "📱" : "📻"), pos.x, pos.y);
+
+                // Label below node
+                ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+                ctx.fillStyle = isLight ? "#0f172a" : "#f8fafc";
+                ctx.fillText(pos.label, pos.x, pos.y + 36);
+
+                // Packet count badge
+                if (hasPackets) {
+                    ctx.beginPath();
+                    ctx.arc(pos.x + 18, pos.y - 18, 9, 0, Math.PI * 2);
+                    ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
+                    ctx.fill();
+                    ctx.font = "700 10px 'JetBrains Mono', monospace";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillText(dev.packetCount, pos.x + 18, pos.y - 18);
+                }
+            }
+
+            requestAnimationFrame(renderMesh);
+        }
+        requestAnimationFrame(renderMesh);
+
+        function spawnHopParticles(fromNodeId, toNodeId, color = "#38bdf8") {
+            const p1 = nodePositions[fromNodeId];
+            const p2 = nodePositions[toNodeId];
+            if (!p1 || !p2) return;
+            particles.push({
+                fromX: p1.x, fromY: p1.y,
+                toX: p2.x, toY: p2.y,
+                startTime: Date.now(),
+                duration: 600,
+                color: color,
+                size: 5
+            });
+        }
+
+        // ------------------------------------------------------------- Telemetry & Toast
+        function logTerm(msg, type = "info") {
+            const el = document.getElementById('termOutput');
+            const row = document.createElement('div');
+            row.className = `term-line term-${type}`;
+            const timeStr = new Date().toLocaleTimeString();
+            row.innerHTML = `<span class="term-time">[${timeStr}]</span> ${msg}`;
+            el.prepend(row);
+        }
+
+        function showToast(msg, type = "success") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            const icon = type === 'success' ? '✅' : (type === 'danger' ? '❌' : '⚠️');
+            toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 20);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ------------------------------------------------------------- PIN Pad Logic
+        const pinDots = [
+            document.getElementById('dot0'),
+            document.getElementById('dot1'),
+            document.getElementById('dot2'),
+            document.getElementById('dot3')
+        ];
+
+        function updatePinDisplay() {
+            pinDots.forEach((d, idx) => {
+                if (idx < enteredPin.length) d.classList.add('filled');
+                else d.classList.remove('filled');
+            });
+        }
+
+        document.querySelectorAll('.num-btn[data-num]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (enteredPin.length < 4) {
+                    enteredPin += btn.dataset.num;
+                    playTone(1200, 'sine', 0.04);
+                    updatePinDisplay();
+                }
+            });
+        });
+
+        document.getElementById('pinBackBtn').addEventListener('click', () => {
+            if (enteredPin.length > 0) {
+                enteredPin = enteredPin.slice(0, -1);
+                playTone(900, 'sine', 0.04);
+                updatePinDisplay();
+            }
+        });
+
+        document.getElementById('pinClearBtn').addEventListener('click', () => {
+            enteredPin = "";
+            playTone(600, 'sine', 0.05);
+            updatePinDisplay();
+        });
+
+        // Quick Amount Chips
+        document.querySelectorAll('.chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.getElementById('amountInput').value = chip.dataset.amt;
+                playTone(1000, 'sine', 0.03);
+            });
+        });
+
+        // Sender selection avatar update
+        const senderSelect = document.getElementById('senderSelect');
+        senderSelect.addEventListener('change', () => {
+            const opt = senderSelect.options[senderSelect.selectedIndex];
+            document.getElementById('senderAvatar').textContent = opt.dataset.avatar || 'U';
+            document.getElementById('senderNameDisplay').textContent = opt.text.split(' ')[0];
+        });
+
+        // ------------------------------------------------------------- API Interactions
+        async function fetchState() {
+            try {
+                // 1. Mesh State
+                const m = await fetch('/api/mesh/state').then(r => r.json());
+                meshDevices = m.devices || [];
+                document.getElementById('cacheBadge').textContent = `Idempotency Cache: ${m.idempotencyCacheSize} entries`;
+
+                // Update node positions with newly added devices
+                meshDevices.forEach((d, idx) => {
+                    if (!nodePositions[d.deviceId]) {
+                        nodePositions[d.deviceId] = {
+                            x: 200 + ((idx * 80) % 400),
+                            y: 150 + ((idx * 50) % 200),
+                            label: d.deviceId.replace('phone-', ''),
+                            isBridge: d.hasInternet
+                        };
+                    } else {
+                        nodePositions[d.deviceId].isBridge = d.hasInternet;
+                    }
+                });
+
+                // 2. Accounts
+                const accs = await fetch('/api/accounts').then(r => r.json());
+                const accTbody = document.querySelector('#accountsTable tbody');
+                accTbody.innerHTML = accs.map(a => `
+                    <tr>
+                        <td><strong>${a.vpa}</strong></td>
+                        <td style="color:var(--text-muted);">${a.holderName}</td>
+                        <td style="text-align: right;" class="balance-val">₹${parseFloat(a.balance).toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                // 3. Transactions
+                const txs = await fetch('/api/transactions').then(r => r.json());
+                document.getElementById('txCountBadge').textContent = `${txs.length} records`;
+                const txTbody = document.querySelector('#ledgerTable tbody');
+                txTbody.innerHTML = txs.map(t => `
+                    <tr>
+                        <td style="font-family:'JetBrains Mono'; font-weight:700; color:var(--cyan);">#${t.id}</td>
+                        <td style="font-size:11px;">${t.senderVpa.split('@')[0]} ➜ ${t.receiverVpa.split('@')[0]}</td>
+                        <td class="balance-val">₹${parseFloat(t.amount).toFixed(2)}</td>
+                        <td><span class="badge-status badge-${t.status}">${t.status}</span></td>
+                        <td style="font-family:'JetBrains Mono'; color:var(--text-dim);">${t.hopCount}</td>
+                    </tr>
+                `).join('');
+
+            } catch (err) {
+                console.error("State refresh failed:", err);
+            }
+        }
+
+        // Inject Payment
+        document.getElementById('injectBtn').addEventListener('click', async () => {
+            const senderVpa = senderSelect.value;
+            const receiverVpa = document.getElementById('receiverSelect').value;
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            const pinToUse = enteredPin.length === 4 ? enteredPin : "1234";
+
+            const opt = senderSelect.options[senderSelect.selectedIndex];
+            const startDevice = opt.dataset.device || "phone-alice";
+
+            try {
+                const res = await fetch('/api/demo/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderVpa, receiverVpa, amount, pin: pinToUse, ttl: 5, startDevice
+                    })
+                }).then(r => r.json());
+
+                playTone(1050, 'sine', 0.12);
+                logTerm(`[INJECTED] Packet ${res.packetId.substring(0, 8)} created on ${startDevice}. Encrypted with RSA-2048/AES-GCM (TTL: ${res.ttl})`, 'info');
+                showToast(`Payment ₹${amount} encrypted and queued on ${startDevice}!`, 'success');
+
+                // Advance story step
+                setStoryStep(2);
+                fetchState();
+            } catch(e) {
+                showToast("Failed to inject packet: " + e.message, "danger");
+            }
+        });
+
+        // Gossip 1 Hop
+        document.getElementById('gossipBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/mesh/gossip', { method: 'POST' }).then(r => r.json());
+                playHopBlip();
+
+                // Trigger visual particles between adjacent nodes
+                const nodeKeys = Object.keys(nodePositions);
+                for (let i = 0; i < nodeKeys.length - 1; i++) {
+                    spawnHopParticles(nodeKeys[i], nodeKeys[i+1]);
+                }
+
+                logTerm(`[BLE GOSSIP] Completed gossip round: ${res.transfers} packet hops across mesh network`, 'info');
+                showToast(`Gossip executed: ${res.transfers} hops!`, 'success');
+
+                setStoryStep(3);
+                fetchState();
+            } catch(e) {
+                showToast("Gossip failed", "danger");
+            }
+        });
+
+        // Bridges Upload
+        document.getElementById('flushBtn').addEventListener('click', async () => {
+            try {
+                playUploadSweep();
+                const res = await fetch('/api/mesh/flush', { method: 'POST' }).then(r => r.json());
+
+                if (res.uploadsAttempted === 0) {
+                    showToast("No packets held by online 4G bridge nodes", "warn");
+                    logTerm("[UPLOAD] 0 bridge uploads attempted (no bridge holding packets)", "warn");
+                    return;
+                }
+
+                res.results.forEach(item => {
+                    if (item.outcome === 'SETTLED') {
+                        playSuccessChord();
+                        logTerm(`[SETTLED] Tx #${item.transactionId} settled successfully via bridge ${item.bridgeNode}!`, 'success');
+                        showToast(`Transaction #${item.transactionId} Settled!`, 'success');
+                        setStoryStep(4);
+                    } else if (item.outcome === 'DUPLICATE_DROPPED') {
+                        playTone(300, 'sawtooth', 0.15);
+                        logTerm(`[IDEMPOTENCY] Packet ${item.packetId} duplicate detected from ${item.bridgeNode} — dropped`, 'warn');
+                        showToast(`Duplicate dropped by Idempotency Engine`, 'warn');
+                    } else {
+                        playErrorBuzz();
+                        logTerm(`[REJECTED] Ingestion rejected: ${item.reason}`, 'danger');
+                        showToast(`Rejected: ${item.reason}`, 'danger');
+                    }
+                });
+
+                fetchState();
+            } catch(e) {
+                showToast("Bridge flush failed", "danger");
+            }
+        });
+
+        // Reset Mesh
+        document.getElementById('clearMeshBtn').addEventListener('click', async () => {
+            await fetch('/api/mesh/reset', { method: 'POST' });
+            playTone(400, 'sine', 0.1);
+            showToast("Mesh cleared and idempotency cache reset", "warn");
+            logTerm("[RESET] Virtual devices cleared and idempotency cache emptied", "warn");
+            setStoryStep(1);
+            fetchState();
+        });
+
+        // Reset Balances
+        document.getElementById('resetAccountsBtn').addEventListener('click', async () => {
+            await fetch('/api/demo/reset-accounts', { method: 'POST' });
+            playTone(600, 'sine', 0.1);
+            showToast("Account balances reset to defaults", "success");
+            logTerm("[RESET] Bank accounts restored to initial seed balances", "info");
+            fetchState();
+        });
+
+        // Add Stranger Phone
+        document.getElementById('addDeviceBtn').addEventListener('click', async () => {
+            const devNum = Object.keys(nodePositions).length + 1;
+            const newId = `phone-stranger${devNum}`;
+            await fetch('/api/mesh/device/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceId: newId, hasInternet: false })
+            });
+
+            nodePositions[newId] = {
+                x: 180 + Math.random() * 250,
+                y: 100 + Math.random() * 200,
+                label: `Stranger ${devNum}`,
+                isBridge: false
+            };
+
+            playTone(800, 'sine', 0.08);
+            showToast(`Added ${newId} to mesh network!`, 'success');
+            logTerm(`[TOPOLOGY] Added virtual peer ${newId} (BLE Active, Offline)`, 'info');
+            fetchState();
+        });
+
+        // Tamper Selected / First packet
+        document.getElementById('tamperSelectedBtn').addEventListener('click', async () => {
+            const res = await fetch('/api/demo/tamper', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceId: 'phone-stranger1' })
+            }).then(r => r.json());
+
+            if (res.tampered) {
+                playErrorBuzz();
+                showToast("Corrupted ciphertext on phone-stranger1!", "danger");
+                logTerm("[TAMPER] Intercepted and corrupted 1 byte of AES-GCM ciphertext on phone-stranger1", "danger");
+            } else {
+                showToast("No packet found on stranger node to tamper with", "warn");
+            }
+            fetchState();
+        });
+
+        // ------------------------------------------------------------- Security Lab Actions
+        document.getElementById('attackTamperCard').addEventListener('click', async () => {
+            const res = await fetch('/api/demo/tamper', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceId: 'phone-stranger1' })
+            }).then(r => r.json());
+
+            if (res.tampered) {
+                playErrorBuzz();
+                showToast("Attack injected: Tampered ciphertext on intermediary phone!", "danger");
+                logTerm("[ATTACK: TAMPER] Malicious node altered encrypted packet payload. Next bridge upload will fail GCM auth.", "danger");
+            } else {
+                showToast("Inject a packet into the mesh first, then run gossip before tampering!", "warn");
+            }
+        });
+
+        document.getElementById('attackReplayCard').addEventListener('click', async () => {
+            const res = await fetch('/api/demo/replay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceId: 'phone-bridge' })
+            });
+
+            if (res.ok) {
+                const r = await res.json();
+                if (r.outcome === 'DUPLICATE_DROPPED') {
+                    playTone(250, 'sawtooth', 0.2);
+                    showToast("Replay Attack Blocked! Dropped by Idempotency Engine.", "warn");
+                    logTerm(`[ATTACK: REPLAY BLOCKED] Duplicate packet ${r.packetHash.substring(0, 12)}... intercepted and rejected in <2ms!`, "warn");
+                } else {
+                    showToast(`Result: ${r.outcome}`, "info");
+                }
+            } else {
+                showToast("No packet currently held on bridge node to replay", "warn");
+            }
+            fetchState();
+        });
+
+        document.getElementById('attackRaceCard').addEventListener('click', async () => {
+            showToast("Launching 3 concurrent bridge uploads...", "info");
+            logTerm("[ATTACK: RACE CONDITION] Dispatching 3 concurrent worker threads with identical ciphertext...", "info");
+            
+            // Trigger flush which executes parallel stream on bridge uploads
+            const res = await fetch('/api/mesh/flush', { method: 'POST' }).then(r => r.json());
+            let settledCount = 0;
+            let duplicateCount = 0;
+
+            res.results.forEach(r => {
+                if (r.outcome === 'SETTLED') settledCount++;
+                if (r.outcome === 'DUPLICATE_DROPPED') duplicateCount++;
+            });
+
+            if (settledCount === 1) {
+                playSuccessChord();
+                showToast(`Race condition verified: Exactly 1 settled, ${duplicateCount} dropped!`, "success");
+                logTerm(`[CONCURRENCY PASS] Exactly 1 thread acquired atomic lock. ${duplicateCount} duplicate threads dropped.`, "success");
+            } else {
+                showToast(`Results: ${settledCount} settled, ${duplicateCount} duplicates`, "info");
+            }
+            fetchState();
+        });
+
+        // ------------------------------------------------------------- Story Step Tracker
+        function setStoryStep(step) {
+            activeStoryStep = step;
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`step${i}Indicator`);
+                el.classList.remove('active', 'completed');
+                if (i < step) el.classList.add('completed');
+                else if (i === step) el.classList.add('active');
+            }
+        }
+
+        // ------------------------------------------------------------- Auto-Run Story Flow
+        document.getElementById('autoDemoBtn').addEventListener('click', async () => {
+            showToast("Starting Auto-Run Demo story...", "info");
+            logTerm("[STORY DEMO] Auto-running full offline UPI lifecycle...", "info");
+
+            // Step 1: Inject
+            document.getElementById('injectBtn').click();
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Step 2: Gossip Round 1
+            document.getElementById('gossipBtn').click();
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Step 3: Gossip Round 2
+            document.getElementById('gossipBtn').click();
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Step 4: Bridges Upload
+            document.getElementById('flushBtn').click();
+        });
+
+        // Clear Log
+        document.getElementById('clearLogBtn').addEventListener('click', () => {
+            document.getElementById('termOutput').innerHTML = "";
+        });
+
+        // Live Clock on Phone
+        function updatePhoneClock() {
+            const now = new Date();
+            document.getElementById('phoneClock').textContent = 
+                now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updatePhoneClock, 1000);
+        updatePhoneClock();
+        // ------------------------------------------------------------- Theme Toggle (Dark / Light)
+        const themeBtn = document.getElementById('themeToggleBtn');
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.body.classList.add('light-theme');
+                if (themeBtn) themeBtn.textContent = '☀️ Light Mode';
+            } else {
+                document.body.classList.remove('light-theme');
+                if (themeBtn) themeBtn.textContent = '🌙 Dark Mode';
+            }
+            try {
+                localStorage.setItem('paykaro-theme', theme);
+            } catch(e) {}
+        }
+
+        if (themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                const isCurrentlyLight = document.body.classList.contains('light-theme');
+                applyTheme(isCurrentlyLight ? 'dark' : 'light');
+            });
+        }
+
+        // Initialize saved theme
+        const savedTheme = localStorage.getItem('paykaro-theme') || 'dark';
+        applyTheme(savedTheme);
+
+        // Polling loop
+        fetchState();
+        setInterval(fetchState, 2500);
+    </script>
+</body>
+</html>
